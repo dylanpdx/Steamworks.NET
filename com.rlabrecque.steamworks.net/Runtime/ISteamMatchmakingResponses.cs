@@ -16,6 +16,7 @@
 	#define NOTHISPTR
 #endif
 
+using AOT;
 using System;
 using System.Runtime.InteropServices;
 
@@ -41,9 +42,9 @@ namespace Steamworks {
 		private VTable m_VTable;
 		private IntPtr m_pVTable;
 		private GCHandle m_pGCHandle;
-		private ServerResponded m_ServerResponded;
-		private ServerFailedToRespond m_ServerFailedToRespond;
-		private RefreshComplete m_RefreshComplete;
+		private static ServerResponded m_ServerResponded;
+		private static ServerFailedToRespond m_ServerFailedToRespond;
+		private static RefreshComplete m_RefreshComplete;
 
 		public ISteamMatchmakingServerListResponse(ServerResponded onServerResponded, ServerFailedToRespond onServerFailedToRespond, RefreshComplete onRefreshComplete) {
 			if (onServerResponded == null || onServerFailedToRespond == null || onRefreshComplete == null) {
@@ -81,7 +82,8 @@ namespace Steamworks {
 		private delegate void InternalServerFailedToRespond(HServerListRequest hRequest, int iServer);
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
 		private delegate void InternalRefreshComplete(HServerListRequest hRequest, EMatchMakingServerResponse response);
-		private void InternalOnServerResponded(HServerListRequest hRequest, int iServer) {
+		[MonoPInvokeCallback(typeof(InternalServerResponded))]
+		private static void InternalOnServerResponded(HServerListRequest hRequest, int iServer) {
 			try
 			{
 				m_ServerResponded(hRequest, iServer);
@@ -91,7 +93,8 @@ namespace Steamworks {
 				CallbackDispatcher.ExceptionHandler(e);
 			}
 		}
-		private void InternalOnServerFailedToRespond(HServerListRequest hRequest, int iServer) {
+		[MonoPInvokeCallback(typeof(InternalServerFailedToRespond))]
+		private static void InternalOnServerFailedToRespond(HServerListRequest hRequest, int iServer) {
 			try
 			{
 				m_ServerFailedToRespond(hRequest, iServer);
@@ -101,7 +104,8 @@ namespace Steamworks {
 				CallbackDispatcher.ExceptionHandler(e);
 			}
 		}
-		private void InternalOnRefreshComplete(HServerListRequest hRequest, EMatchMakingServerResponse response) {
+		[MonoPInvokeCallback(typeof(InternalRefreshComplete))]
+		private static void InternalOnRefreshComplete(HServerListRequest hRequest, EMatchMakingServerResponse response) {
 			try
 			{
 				m_RefreshComplete(hRequest, response);
@@ -118,7 +122,8 @@ namespace Steamworks {
 		private delegate void InternalServerFailedToRespond(IntPtr thisptr, HServerListRequest hRequest, int iServer);
 		[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
 		private delegate void InternalRefreshComplete(IntPtr thisptr, HServerListRequest hRequest, EMatchMakingServerResponse response);
-		private void InternalOnServerResponded(IntPtr thisptr, HServerListRequest hRequest, int iServer) {
+		[MonoPInvokeCallback(typeof(InternalServerResponded))]
+		private static void InternalOnServerResponded(IntPtr thisptr, HServerListRequest hRequest, int iServer) {
 			try
 			{
 				m_ServerResponded(hRequest, iServer);
@@ -128,7 +133,8 @@ namespace Steamworks {
 				CallbackDispatcher.ExceptionHandler(e);
 			}
 		}
-		private void InternalOnServerFailedToRespond(IntPtr thisptr, HServerListRequest hRequest, int iServer) {
+		[MonoPInvokeCallback(typeof(InternalServerFailedToRespond))]
+		private static void InternalOnServerFailedToRespond(IntPtr thisptr, HServerListRequest hRequest, int iServer) {
 			try
 			{
 				m_ServerFailedToRespond(hRequest, iServer);
@@ -138,7 +144,8 @@ namespace Steamworks {
 				CallbackDispatcher.ExceptionHandler(e);
 			}
 		}
-		private void InternalOnRefreshComplete(IntPtr thisptr, HServerListRequest hRequest, EMatchMakingServerResponse response) {
+		[MonoPInvokeCallback(typeof(InternalRefreshComplete))]
+		private static void InternalOnRefreshComplete(IntPtr thisptr, HServerListRequest hRequest, EMatchMakingServerResponse response) {
 			try
 			{
 				m_RefreshComplete(hRequest, response);
